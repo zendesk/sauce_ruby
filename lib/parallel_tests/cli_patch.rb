@@ -15,7 +15,7 @@ module ParallelTests
         end
 
         Sauce.logger.debug "Parallel Tests reporting results."
-        report_results(test_results)
+        report_results(test_results, options)
       end
 
       abort final_fail_message if any_test_failed?(test_results)
