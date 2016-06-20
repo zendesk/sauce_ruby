@@ -22,22 +22,28 @@ module ParallelTests
 
 
       def self.tests_in_groups(tests, num_groups, options={})
-        all_tests = super.flatten * Sauce::TestBroker.test_platforms(:rspec).length
-        base_group_size = all_tests.length / num_groups
-        num_full_groups = all_tests.length - (base_group_size * num_groups)
+        _tests_in_groups = super
+        test_platforms = Sauce::TestBroker.test_platforms(:rspec)
+        # ignore groupping by runtime/size from super when we need to run tests against several platforms (cross-browser)
+        if test_platforms.length > 1
+          all_tests = _tests_in_groups.flatten * test_platforms.length
+          base_group_size = all_tests.length / num_groups
+          num_full_groups = all_tests.length - (base_group_size * num_groups)
 
-        curpos = 0
-        groups = []
-        num_groups.times do |i|
-          group_size = base_group_size
-          if i < num_full_groups
-            group_size += 1
+          curpos = 0
+          groups = []
+          num_groups.times do |i|
+            group_size = base_group_size
+            if i < num_full_groups
+              group_size += 1
+            end
+            groups << all_tests.slice(curpos, group_size)
+            curpos += group_size
           end
-          groups << all_tests.slice(curpos, group_size)
-          curpos += group_size
+          groups
+        else
+          _tests_in_groups
         end
-
-        groups
       end
     end
   end
