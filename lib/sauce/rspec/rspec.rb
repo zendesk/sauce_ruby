@@ -143,7 +143,10 @@ begin
               thread_id = Thread.current.object_id
               Sauce.logger.debug "RSpec - Thread #{thread_id} storing driver #{@selenium.session_id} in driver pool."
               Sauce.driver_pool[thread_id] = @selenium
-              example.metadata[:sauce_public_link] = SauceWhisk.public_link(@selenium.session_id)
+              sauce_public_link = SauceWhisk.public_link(@selenium.session_id)
+              example.metadata[:sauce_public_link] = sauce_public_link
+              example.metadata[:sauce_job_id] = @selenium.session_id
+              example.metadata[:sauce_auth_token] = sauce_public_link.split('?auth=').try(:[], 1)
 
               begin
                 Sauce.logger.debug "About to initiate test #{description}"
